@@ -1,4 +1,6 @@
 import random
+import os
+import pickle
 from colorama import init, Fore, Back, Style
 
 init(autoreset=True)
@@ -90,14 +92,37 @@ def visualize_maze_with_path(maze, path):
                 print(Back.LIGHTBLACK_EX + "  ", end="")
         print()
 
+def save_mazes(mazes, folder_path):
+    os.makedirs(folder_path, exist_ok=True)
+    for i, maze in enumerate(mazes):
+        file_path = os.path.join(folder_path, f'maze_{i+1}.pkl')
+        with open(file_path, 'wb') as file:
+            pickle.dump(maze, file)
+    print(f"{len(mazes)} mazes saved to {folder_path}")
+
+def generate_and_save_mazes(num_mazes, maze_size, folder_path):
+    mazes = [generate_maze(maze_size) for _ in range(num_mazes)]
+    save_mazes(mazes, folder_path)
+
+def load_mazes(folder_path):
+    mazes = []
+    for file_name in os.listdir(folder_path):
+        if file_name.endswith(".pkl"):
+            file_path = os.path.join(folder_path, file_name)
+            with open(file_path, 'rb') as file:
+                maze = pickle.load(file)
+                mazes.append(maze)
+    return mazes
+
 # Main function
 def main():
-    maze_size = 10
+    maze_size = 15
     maze = generate_maze(maze_size)
 
     maze[0][0].blocked = False
     maze[maze_size-1][maze_size-1].blocked = False
-    visualize_manhattan(maze)
+    visualize_maze(maze)
 
 if __name__ == "__main__":
     main()
+
